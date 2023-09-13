@@ -5,12 +5,13 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // SignupRequest defines model for SignupRequest.
 type SignupRequest struct {
-	Email    *string `json:"email,omitempty"`
-	Password *string `json:"password,omitempty"`
+	Email    *openapi_types.Email `json:"email,omitempty"`
+	Password *string              `json:"password,omitempty"`
 }
 
 // SignupResponse defines model for SignupResponse.
@@ -23,7 +24,7 @@ type SignupJSONRequestBody = SignupRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Signup
+	// User Signup
 	// (POST /user/signup)
 	Signup(ctx echo.Context) error
 }

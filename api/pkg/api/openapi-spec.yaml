@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Echo Rest API
+  description: A sample rest api
+  termsOfService: TODO
+  license:
+    name: TODO
+    url: TODO
+  version: 0.1.0
+  contact:
+    name: Anuj Parihar
+    url: https://github.com/BearTS
+    email: anujparihar@yahoo.com
+servers:
+- url: http://localhost:8080
+  description: Local development server
+paths:
+  '/user/signup':
+    post:
+      summary: Signup
+      operationId: Signup
+      tags:
+      - Signup
+      requestBody:
+        description: Signup
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: Signup response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+components:
+  schemas:
+    SignupRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    SignupResponse:
+      type: object
+      properties:
+        message:
+          type: string

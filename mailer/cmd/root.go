@@ -9,22 +9,16 @@ import (
 
 	"github.com/BearTS/go-echo-template/mailer/pkg"
 	"github.com/BearTS/go-echo-template/pkg/logger"
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
 var numWorkers int // Number of worker goroutines for parallel processing
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "mailer",
 	Short: "Start the mailer service",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger := logger.GetInstance()
-		err := godotenv.Load(".env")
-		if err != nil {
-			logger.Fatal(err)
-			return
-		}
 		ctx, cancel := context.WithCancel(context.Background())
 
 		// Setup a signal channel to handle graceful shutdown
@@ -65,11 +59,11 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().IntVarP(&numWorkers, "workers", "w", 1, "Number of worker goroutines")
+	RootCmd.PersistentFlags().IntVarP(&numWorkers, "workers", "w", 1, "Number of worker goroutines")
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

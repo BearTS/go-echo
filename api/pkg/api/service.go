@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"

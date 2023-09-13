@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/BearTS/go-echo-template/api/pkg/api"
-	"github.com/BearTS/go-echo-template/api/pkg/services/usersvc"
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/api/pkg/api"
+	"github.com/BearTS/go-echo/api/pkg/services/usersvc"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -19,7 +19,7 @@ import (
 
 func RootCmd() *cobra.Command {
 	opts := &api.Options{
-		Path:                "/rest/v0",
+		Path:                "/v1",
 		Port:                8080,
 		ShutdownGracePeriod: 5 * time.Second,
 	}

@@ -1,7 +1,7 @@
 package usersvc
 
 import (
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )

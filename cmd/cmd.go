@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	api "github.com/BearTS/go-echo-template/api/cmd"
-	mailer "github.com/BearTS/go-echo-template/mailer/cmd"
+	api "github.com/BearTS/go-echo/api/cmd"
+	mailer "github.com/BearTS/go-echo/mailer/cmd"
 
 	"github.com/spf13/cobra"
 )

@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/BearTS/go-echo-template/mailer/pkg"
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/mailer/pkg"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

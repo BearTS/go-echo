@@ -1,4 +1,4 @@
-module github.com/BearTS/go-echo-template
+module github.com/BearTS/go-echo
 
 go 1.20
 

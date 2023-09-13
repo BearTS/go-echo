@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/go-playground/validator/v10"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"

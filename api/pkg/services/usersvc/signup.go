@@ -1,7 +1,7 @@
 package usersvc
 
 import (
-	"github.com/BearTS/go-echo-template/api/pkg/api"
+	"github.com/BearTS/go-echo/api/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 

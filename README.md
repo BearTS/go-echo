@@ -1,2 +1,2 @@
-# go-echo-template
-To be a Go Echo Template
+# go-echo
+To be a Go Echo Example repo

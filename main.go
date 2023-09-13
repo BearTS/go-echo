@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/BearTS/go-echo-template/cmd"
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/cmd"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/joho/godotenv"
 )
 

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/BearTS/go-echo-template/pkg/logger"
+	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/pkg/errors"
 
 	amqp "github.com/rabbitmq/amqp091-go"

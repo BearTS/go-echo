@@ -12,6 +12,7 @@ import (
 	"github.com/BearTS/go-echo/api/pkg/api"
 	"github.com/BearTS/go-echo/api/pkg/services/usersvc"
 	"github.com/BearTS/go-echo/pkg/logger"
+	messagebroker "github.com/BearTS/go-echo/pkg/message_broker"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -20,22 +21,29 @@ import (
 func RootCmd() *cobra.Command {
 	opts := &api.Options{
 		Path:                "/v1",
-		Port:                8080,
+		Port:                3000,
 		ShutdownGracePeriod: 5 * time.Second,
 	}
 	deps := &api.Dependencies{
 		Logger: logger.GetInstance(),
 	}
-	// gormDB, _ := database.Connection()
-	// deps.GormDB = gormDB
-	userSvc := usersvc.Handler(deps.GormDB)
-	deps.Services.UserSvc = userSvc
 
 	c := &cobra.Command{
 		Use:   "api",
 		Short: "serves the tenant REST API",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := context.WithCancel(context.Background())
+
+			rabbitMq, err := messagebroker.NewRabbitMQHelper(os.Getenv("RABBITMQ_HOST_PORT"), 1, deps.Logger)
+			if err != nil {
+				logger.Error(errors.Wrap(err, "failed to initialize RabbitMQ"))
+			}
+			defer rabbitMq.Close()
+
+			// gormDB, _ := database.Connection()
+			// deps.GormDB = gormDB
+			userSvc := usersvc.Handler(deps.GormDB, deps.Logger, rabbitMq)
+			deps.Services.UserSvc = userSvc
 
 			service, serviceErr := api.NewService(ctx, opts, deps)
 			if serviceErr != nil {

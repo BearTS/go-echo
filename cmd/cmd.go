@@ -20,8 +20,8 @@ var cmd = &cobra.Command{
 
 // Execute - starts the CLI
 func init() {
-	cmd.AddCommand(api.RootCmd())
 	cmd.AddCommand(mailer.RootCmd)
+	cmd.AddCommand(api.RootCmd())
 }
 
 func Execute() {

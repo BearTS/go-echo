@@ -27,28 +27,30 @@ type EchoServer interface {
 }
 
 type Service struct {
-	ctx      context.Context
-	opts     *Options
-	logger   logger.Logger
-	server   EchoServer
-	rabbitMq *RabbitMqService
-	gormDB   *gorm.DB
-	spec     map[string]interface{}
+	ctx    context.Context
+	opts   *Options
+	logger logger.Logger
+	server EchoServer
+	spec   map[string]interface{}
 
 	Services Services
 }
 
 // Dependencies - dependencies for Service constructor
 type Dependencies struct {
-	Logger     logger.Logger
-	EchoServer EchoServer
-	RabbitMq   *RabbitMqService
-	GormDB     *gorm.DB
-	Services   Services
+	Logger        logger.Logger
+	EchoServer    EchoServer
+	MessageBroker MessageBroker
+	GormDB        *gorm.DB
+	Services      Services
 }
 
 type RabbitMqService struct {
 	HostPort string
+}
+
+type MessageBroker interface {
+	Publish(ctx context.Context, exchange, routingKey string, body []byte) error
 }
 
 type Options struct {
@@ -77,8 +79,6 @@ func NewService(ctx context.Context, opts *Options, deps *Dependencies) (*Servic
 		opts:     opts,
 		logger:   deps.Logger,
 		server:   deps.EchoServer,
-		rabbitMq: deps.RabbitMq,
-		gormDB:   deps.GormDB,
 		spec:     make(map[string]interface{}),
 		Services: deps.Services,
 	}

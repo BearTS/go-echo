@@ -7,50 +7,42 @@ import (
 
 	"github.com/BearTS/go-echo/pkg/logger"
 	"github.com/pkg/errors"
-
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Service struct {
-	Logger logger.Logger
-	Mailer *MailInstance
-	Worker *WorkerService
+	Logger        logger.Logger
+	Mailer        *MailInstance
+	Worker        *WorkerService
+	MessageBroker MessageBroker
 }
 
 type WorkerService struct {
-	HostPort  string
-	QueueName string
+	QueueName    string
+	NumOfWorkers int
 }
 
-func NewService(logger logger.Logger, mailer *MailInstance, worker *WorkerService) *Service {
+type MessageBroker interface {
+	GetChannel() *amqp.Channel
+}
+
+func NewService(logger logger.Logger, mailer *MailInstance, worker *WorkerService, messageBroker MessageBroker) *Service {
 	return &Service{
-		Logger: logger,
-		Mailer: mailer,
-		Worker: worker,
+		Logger:        logger,
+		Mailer:        mailer,
+		Worker:        worker,
+		MessageBroker: messageBroker,
 	}
 }
 
-func (svc *Service) StartConsumer(ctx context.Context, numWorkers int) {
-	conn, err := amqp.Dial(svc.Worker.HostPort)
-	if err != nil {
-		svc.Logger.Fatal(errors.Wrap(err, "failed to connect to RabbitMQ"))
-		return
-	}
-	defer conn.Close()
-
-	ch, err := conn.Channel()
-	if err != nil {
-		svc.Logger.Fatal(errors.Wrap(err, "failed to open a channel"))
-		return
-	}
-	defer ch.Close()
-
+func (svc *Service) StartConsumer(ctx context.Context) {
+	ch := svc.MessageBroker.GetChannel()
 	q, err := ch.QueueDeclare(
 		svc.Worker.QueueName, // name
 		true,                 // durable
 		false,                // delete when unused
 		false,                // exclusive
-		false,                // no-wait
+		false,                // nowait
 		nil,                  // arguments
 	)
 	if err != nil {
@@ -59,7 +51,7 @@ func (svc *Service) StartConsumer(ctx context.Context, numWorkers int) {
 	}
 
 	ch.Qos(
-		numWorkers, // Set the maximum number of unacknowledged messages to the number of workers.
+		svc.Worker.NumOfWorkers, // Set the maximum number of unacknowledged messages to the number of workers.
 		0,
 		false,
 	)
@@ -80,8 +72,7 @@ func (svc *Service) StartConsumer(ctx context.Context, numWorkers int) {
 
 	svc.Logger.Info(" [*] Waiting for messages. To exit press CTRL+C")
 
-	// Start worker goroutines to process messages concurrently
-	for i := 0; i < numWorkers; i++ {
+	for i := 0; i < svc.Worker.NumOfWorkers; i++ {
 		go func(workerID int) {
 			for delivery := range msgs {
 				var msg Message
@@ -98,8 +89,8 @@ func (svc *Service) StartConsumer(ctx context.Context, numWorkers int) {
 				delivery.Ack(false) // Acknowledge the message
 			}
 		}(i)
+
 	}
 
-	// Block and wait for signals to gracefully shutdown the consumer
 	<-ctx.Done()
 }

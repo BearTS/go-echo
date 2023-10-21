@@ -1,13 +1,14 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type UserService interface {
-	SignUp(c echo.Context, req SignupRequest) error
+	SignUp(c context.Context, req SignupRequest) (SignupResponse, error)
 }
 
 // SignUp - Signup
@@ -23,14 +24,13 @@ func (svc *Service) Signup(c echo.Context) error {
 	}
 
 	// You can now perform your signup logic here
-	err := svc.Services.UserSvc.SignUp(c, *request)
+	response, err := svc.Services.UserSvc.SignUp(c.Request().Context(), *request)
 	if err != nil {
 		svc.logger.Error("Failed to signup:", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to signup")
 	}
+	
 
 	// Return a response (e.g., a success message)
-	return c.JSON(http.StatusOK, map[string]string{
-		"message": "User signed up successfully",
-	})
+	return c.JSON(http.StatusOK, response)
 }

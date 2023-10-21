@@ -9,6 +9,8 @@ import (
 
 	"github.com/BearTS/go-echo/mailer/pkg"
 	"github.com/BearTS/go-echo/pkg/logger"
+	messagebroker "github.com/BearTS/go-echo/pkg/message_broker"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -47,11 +49,18 @@ var RootCmd = &cobra.Command{
 		mailer.SetTransportDetails(smtp_host, smtp_port)
 
 		var worker pkg.WorkerService
-		worker.HostPort = os.Getenv("RABBITMQ_HOST_PORT")
 		worker.QueueName = "mail"
+		worker.NumOfWorkers = numWorkers
 
-		service := pkg.NewService(logger, &mailer, &worker)
-		service.StartConsumer(ctx, numWorkers)
+		rabbitMq, err := messagebroker.NewRabbitMQHelper(os.Getenv("RABBITMQ_HOST_PORT"), worker.NumOfWorkers, logger)
+		if err != nil {
+			logger.Error(errors.Wrap(err, "failed to initialize RabbitMQ"))
+			cancel()
+		}
+		defer rabbitMq.Close()
+
+		service := pkg.NewService(logger, &mailer, &worker, rabbitMq)
+		service.StartConsumer(ctx)
 
 		// Wait for the context to be canceled (e.g., on receiving SIGINT or SIGTERM)
 		<-ctx.Done()

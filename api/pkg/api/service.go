@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/BearTS/go-echo/pkg/logger"
+	"github.com/BearTS/go-echo/pkg/tables"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
@@ -42,6 +43,7 @@ type Dependencies struct {
 	EchoServer    EchoServer
 	MessageBroker MessageBroker
 	GormDB        *gorm.DB
+	DB            *tables.DB
 	Services      Services
 }
 

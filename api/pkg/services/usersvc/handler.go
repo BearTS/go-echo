@@ -4,22 +4,26 @@ import (
 	"context"
 
 	"github.com/BearTS/go-echo/pkg/logger"
-	"gorm.io/gorm"
+	"github.com/BearTS/go-echo/pkg/tables"
 )
 
 type UserSvcImpl struct {
-	gormDB        *gorm.DB
+	DB            UserDb
 	logger        logger.Logger
 	messageBroker MessageBroker
+}
+
+type UserDb interface {
+	CreateUser(user *tables.Users) error
 }
 
 type MessageBroker interface {
 	Publish(ctx context.Context, exchange, routingKey string, body []byte) error
 }
 
-func Handler(gormDB *gorm.DB, logger logger.Logger, messageBroker MessageBroker) *UserSvcImpl {
+func Handler(userDb UserDb, logger logger.Logger, messageBroker MessageBroker) *UserSvcImpl {
 	return &UserSvcImpl{
-		gormDB:        gormDB,
+		DB:            userDb,
 		logger:        logger,
 		messageBroker: messageBroker,
 	}

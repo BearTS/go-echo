@@ -3,27 +3,46 @@ package usersvc
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/BearTS/go-echo/api/pkg/api"
+	"github.com/BearTS/go-echo/pkg/tables"
 )
 
-func (svc *UserSvcImpl) SignUp(c context.Context, req api.SignupRequest) (api.SignupResponse, error) {
+func (svc *UserSvcImpl) SignUp(c context.Context, req api.SignupRequest) (api.SignupResponse, int, error) {
 
 	var message string
 
 	// print the email and password
 	if req.Email != nil {
-		fmt.Println(*req.Email)
+		message = "Email is required"
+		return api.SignupResponse{
+			Message: &message,
+		}, http.StatusBadRequest, nil
 	}
 
 	if req.Password != nil {
-		fmt.Println(*req.Password)
+		message = "Password is required"
+		return api.SignupResponse{
+			Message: &message,
+		}, http.StatusBadRequest, nil
+	}
+
+	// Create a new user
+	var user tables.Users
+	user.Email = string(*req.Email)
+	// Hash the password
+
+
+	if err := svc.DB.CreateUser(&user); err != nil {
+		message = "Failed to create user"
+		return api.SignupResponse{
+			Message: &message,
+		}, http.StatusInternalServerError, err
 	}
 
 	message = "Signup successful. Please check your email for the verification link."
-
 	var signupResponse api.SignupResponse
 	signupResponse.Message = &message
 
@@ -44,10 +63,10 @@ func (svc *UserSvcImpl) SignUp(c context.Context, req api.SignupRequest) (api.Si
 	}
 	err = svc.messageBroker.Publish(c, exchange, routingKey, body)
 	if err != nil {
-		return signupResponse, err
+		return signupResponse, http.StatusInternalServerError, err
 	}
 
-	return signupResponse, nil
+	return signupResponse, http.StatusOK, nil
 }
 
 type Message struct {

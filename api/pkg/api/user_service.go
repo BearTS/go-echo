@@ -8,7 +8,7 @@ import (
 )
 
 type UserService interface {
-	SignUp(c context.Context, req SignupRequest) (SignupResponse, error)
+	SignUp(c context.Context, req SignupRequest) (SignupResponse, int, error)
 }
 
 // SignUp - Signup
@@ -24,12 +24,11 @@ func (svc *Service) Signup(c echo.Context) error {
 	}
 
 	// You can now perform your signup logic here
-	response, err := svc.Services.UserSvc.SignUp(c.Request().Context(), *request)
+	response, httpCode, err := svc.Services.UserSvc.SignUp(c.Request().Context(), *request)
 	if err != nil {
 		svc.logger.Error("Failed to signup:", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to signup")
+		return echo.NewHTTPError(httpCode, "Failed to signup")
 	}
-	
 
 	// Return a response (e.g., a success message)
 	return c.JSON(http.StatusOK, response)

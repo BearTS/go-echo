@@ -10,9 +10,11 @@ import (
 	"time"
 
 	"github.com/BearTS/go-echo/api/pkg/api"
+	"github.com/BearTS/go-echo/api/pkg/database"
 	"github.com/BearTS/go-echo/api/pkg/services/usersvc"
 	"github.com/BearTS/go-echo/pkg/logger"
 	messagebroker "github.com/BearTS/go-echo/pkg/message_broker"
+	"github.com/BearTS/go-echo/pkg/tables"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -40,9 +42,12 @@ func RootCmd() *cobra.Command {
 			}
 			defer rabbitMq.Close()
 
-			// gormDB, _ := database.Connection()
+			gormDB, _ := database.Connection()
 			// deps.GormDB = gormDB
-			userSvc := usersvc.Handler(deps.GormDB, deps.Logger, rabbitMq)
+
+			db := tables.NewDB(gormDB)
+
+			userSvc := usersvc.Handler(db, deps.Logger, rabbitMq)
 			deps.Services.UserSvc = userSvc
 
 			service, serviceErr := api.NewService(ctx, opts, deps)
